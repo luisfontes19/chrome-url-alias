@@ -13,60 +13,42 @@ function updateStore() {
     // Add default keys if empty.
     if (store == null || Object.keys(store).length == 0) {
       store = new Object();
-      store["m"] = "https://mail.google.com";
-      store["c"] = "https://calendar.google.com";
-      store["d"] = "https://drive.google.com";
-      chrome.storage.sync.set({ 'urlalias': store});
+      chrome.storage.sync.set({ 'urlalias': store });
     }
   });
 };
 updateStore();
 
 // Checks if 'server' is to be redirected, and executes the redirect.
-function doRedirectIfSaved(tabId, server, others) {
-  var redirect = store[server];
+function doRedirectIfSaved(tabId, url, secure) {
+  const parts = url.split("/") || [];
 
-  if (redirect == null) {
-    // Check if we have a matching redirect
-    for (var key in store) {
-      if (key.startsWith(server)) {
-        // Found the server
-        redirect = store[key].replace("###", others.join('/'));
-        break;
-      }
-    }
-  }
+  const server = parts[0];
+  const path = "/" + parts.splice(1).join("/");
+
+  const redirect = store[server];
+  if (!redirect) return;
 
   if (redirect.indexOf('://') < 0) {
-    // Add a default protocol
-    redirect = "http://" + redirect;
+    redirect = (secure ? "https://" : "http://") + redirect;
   }
+
   chrome.tabs.update(tabId, { url: redirect });
 }
 
 // Called when the user changes the url of a tab.
-function onTabUpdate(tabId, changeInfo, tab) {
-  var url = tab.url;
+function onBeforeNavigate(details) {
 
-  var url_protocol_stripped = /^http[s]?:\/\/(.*)/g.exec(url);
+  const secure = details.url.startsWith("https://") === true;
+  const url = details.url.replace("https://", "").replace("http://", "")
 
-  if (url_protocol_stripped != null && url_protocol_stripped.length >= 2) {
-    var match = url_protocol_stripped[[1]].split("/");
-    doRedirectIfSaved(tabId, match[0], match.splice(1));
-  }
+  doRedirectIfSaved(details.tabId, url, secure);
+
 }
 
-// Listen for any changes to the URL of any tab.
-chrome.tabs.onUpdated.addListener(onTabUpdate);
+chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate)
 
 // Track changes to data object.
-chrome.storage.onChanged.addListener(function(changes, namespace) {
+chrome.storage.onChanged.addListener(function (changes, namespace) {
   updateStore();
 });
-
-if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) === 0;
-  };
-}

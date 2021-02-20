@@ -1,50 +1,61 @@
 // Saves options to storage.
 function save() {
-  var store = new Object();
+  const store = new Object();
 
-  // Saves all options
-  var entries = $('#entries input');
+  const entries = document.getElementById("entries").getElementsByTagName("input");
   for (var i = 0; i < entries.length; i += 2) {
-    key = entries[i].value;
-    val = entries[i+1].value;
+    const key = entries[i].value;
+    const val = entries[i + 1].value;
 
-    if (key != '' && val != '') {
+    if (key != '' && val != '')
       store[key] = val;
-    }
   }
-  chrome.storage.sync.set({'urlalias' : store});
-
-  // Update status to let user know options were saved.
-  $("#status").html("Changes saved").show().delay(3000).fadeOut();
+  chrome.storage.sync.set({ 'urlredirector': store });
 }
 
-// Restores select box state to saved value from localStorage.
+function addRow(alias, redirect) {
+
+  const table = document.getElementById("entries");
+
+  const row = document.createElement("tr");
+
+  const aliasElement = document.createElement("td");
+  const input1 = document.createElement("input");
+  input1.value = alias;
+  aliasElement.append(input1);
+
+
+  const redirectElement = document.createElement("td");
+  const input2 = document.createElement("input");
+  input2.value = redirect;
+  redirectElement.append(input2);
+
+  const del = document.createElement("button");
+  del.innerText = "Delete";
+  del.onclick = function () { row.remove(); };
+  del.className = "delete";
+
+  row.appendChild(aliasElement);
+  row.appendChild(redirectElement);
+  row.appendChild(del);
+
+  table.getElementsByTagName("tbody")[0].appendChild(row);
+}
+
 function onLoad() {
-  // Restore all options
-  chrome.storage.sync.get('urlalias', function(store) {
-    store = store.urlalias;
+  chrome.storage.sync.get('urlredirector', function (store) {
+    store = store.urlredirector;
     for (var key in store) {
       addRow(key, store[key]);
     }
   });
 
-  // Register click handlers
-  $("#save").click(save);
-  $('#newEntry').click(function() { addRow("", ""); });
+  document.getElementById("newEntry").addEventListener("click", () => addRow("", ""));
+  document.getElementById("save").onclick = save;
+
 }
 
-// Add an individual row to the table.
-function addRow(alias, redirect) {
-  var tr = $('<tr>');
-
-  var del = $('<button class="mdl-button mdl-js-button mdl-button--raised">Delete</button>');
-  del.click(function() { tr.remove();  });
-
-  tr.append($('<td width="30%">').append($('<input>').val(alias)));
-  tr.append($('<td width="60%">').append($('<input>').val(redirect)));
-  tr.append($('<td width="10%">').append(del));
-
-  $('#entries tbody').append(tr);
-}
-
-$(document).ready(onLoad);
+document.addEventListener("readystatechange", (event) => {
+  if (event.target.readyState === "complete")
+    onLoad();
+});

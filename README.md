@@ -1,33 +1,11 @@
-# URL Alias
+# URL Redirector
 
-![](https://raw.githubusercontent.com/karan/chrome-url-alias/master/icon-128.png)
+A simple extension to redirect urls.
 
-A handy Chrome extension to set URL aliases.
+Started as a fork from https://github.com/karan/chrome-url-alias, but I wanted to remove external scripts, so it can be easily inspected for malicious code.
+Also fixed some issues of the original project
 
-[![](http://i.imgur.com/CzUM4CB.png)](https://chrome.google.com/webstore/detail/url-alias/nelckmdlallhkgniidbfafekeldjnakb)
+**NOTE**
+You may have issues with your browser, for specific conditions. For example, in brave an url like "test.local" will automatically be redirected to the search engine. So when the extension gets the url, its already the url from the search. To mitigate this you either need to use something like http://test.local, or use a TLD that the browser recognizes, like "test.localhost"
 
-### Example:
-
-![](http://i.imgur.com/PQNPcDI.png)
-
-## Features
-
-#### Static aliases
-
-*m* (Alias) -> *https://mail.google.com* (Redirect)
-
-#### Dynamic aliases
-
-You can use `###` as a placeholder and anything matching that pattern will be replaced.
-
-Example:
-
-*r/###* (Alias) -> *http://reddit.com/r/###* (Redirect)
-
-#### Aliases synced with Google Account
-
-All settings are synced with Google and available even if you change computers.
-
-## License
-
-Apache 2.0
+![Preview popup](popup.jpg)

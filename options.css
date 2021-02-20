@@ -1,0 +1,29 @@
+body {
+  color: #303942;
+  background-color: #DDD;
+  min-width: 500px;
+}
+
+input {
+  width: 100%;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #CCC;
+}
+
+.delete {
+  background-color: #dc3545;
+  color: #FFF;
+  border: none;
+}
+
+button {
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #999;
+}
+
+.action-buttons {
+  text-align: right;
+  margin-top: 20px;
+}
